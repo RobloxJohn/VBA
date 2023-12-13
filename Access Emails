@@ -1,0 +1,13 @@
+Public Function GetMessage(oObj As Object) As MAPI.Message
+  On Error Resume Next
+  Dim oSess As MAPI.Session
+  Dim sEntryID As String
+  Dim sStoreID As String
+
+  sEntryID = oObj.EntryID
+  sStoreID = oObj.Parent.StoreID
+
+  Set oSess = CreateObject("MAPI.Session")
+  oSess.LogOn , , False, False, , True
+  Set GetMessage = oSess.GetMessage(sEntryID, sStoreID)
+End Function
