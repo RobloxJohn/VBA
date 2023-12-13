@@ -1,0 +1,55 @@
+Private WithEvents m_Inbox As Outlook.Items
+Private WithEvents m_SentItems As Outlook.Items
+
+Private Sub Application_Startup()
+  Dim Session As Outlook.NameSpace
+  Set Session = Application.Session
+  
+  Set m_Inbox = Session.GetDefaultFolder(olFolderInbox).Items
+  Set m_SentItems = Session.GetDefaultFolder(olFolderSentMail).Items
+End Sub
+
+Private Sub m_Inbox_ItemAdd(ByVal Item As Object)
+  AddAddresses Item, False
+End Sub
+
+Private Sub m_SentItems_ItemAdd(ByVal Item As Object)
+  AddAddresses Item, True
+End Sub
+
+Private Sub AddAddresses(Item As Object, ByVal IsSentMail As Boolean)
+  Dim Recipients As Outlook.Recipients
+  Dim R As Outlook.Recipient
+  Dim UserProps As Outlook.UserProperties
+  Dim Prop As Outlook.UserProperty
+  Dim Adr As String
+  Dim FieldName As String
+  
+  If IsSentMail Then
+    FieldName = "RecipientAddresses"
+    Set Recipients = Item.Recipients
+    For Each R In Recipients
+      Adr = Adr & R.Address & "; "
+    Next
+    If Len(Adr) Then
+      Adr = Left$(Adr, Len(Adr) - 2)
+    End If
+  Else
+    FieldName = "SenderAddress"
+    Adr = Item.SenderEmailAddress
+  End If
+  
+  If Len(Adr) Then
+    Set UserProps = Item.UserProperties
+    Set Prop = UserProps.Find(FieldName, True)
+    If Prop Is Nothing Then
+      If IsSentMail Then
+        Set Prop = UserProps.Add(FieldName, olKeywords, True)
+      Else
+        Set Prop = UserProps.Add(FieldName, olText, True)
+      End If
+    End If
+    Prop.Value = Adr
+    Item.Save
+  End If
+End Sub
