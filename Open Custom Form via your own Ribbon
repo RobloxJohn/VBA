@@ -1,0 +1,7 @@
+Public Sub AddMyForm()
+  Dim Items as Outlook.Items
+  Dim Item as Object
+  Set Items=Application.ActiveExplorer.CurrentFolder.Items
+  Set Item=Items.Add("ipm.note.my_test")
+  Item.Display
+End Sub
