@@ -1,0 +1,22 @@
+Public Sub ChangeMessageClassForFolderItems()
+  Dim Items As Outlook.Items
+  Dim obj As Object
+  Dim OldClass$
+  Dim NewClass$
+  Dim i&
+
+  Set Items = Application.ActiveExplorer.CurrentFolder.Items
+  If Items.Count > 1 Then
+    OldClass = Items(1).MessageClass
+    NewClass = InputBox("Change MessageClass property of all items to: " _
+      , "Change MessageClass", OldClass)
+    If NewClass = "" Or LCase$(NewClass) = LCase$(OldClass) Then
+      Exit Sub
+    End If
+    For i = 1 To Items.Count
+      Set obj = Items(i)
+      obj.MessageClass = NewClass
+      obj.Save
+    Next
+  End If
+End Sub
