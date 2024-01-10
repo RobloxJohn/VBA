@@ -1,0 +1,70 @@
+Private Sub CommandButton2_Click()
+Dim fd As Object
+Dim add As String
+Dim wb As Workbook, wk As Workbook
+Dim myfiles As String
+Dim name As String
+If TextBox1.Text = “” Then
+MsgBox “Pls Select Path”, vbInformation
+Else
+Set fd = Application.FileDialog(msoFileDialogFilePicker)
+myfiles = Dir(“” + TextBox1.Text + “*.xlsx”)
+If myfiles = “” Then
+MsgBox “This folder haven’t Excel files… Can’t do further Process..”, vbInformation
+Else
+ThisWorkbook.Activate
+Worksheets.add
+On Error GoTo errHandler:
+ActiveSheet.name = “Summary”
+Sheets(“Lables”).Activate
+ActiveSheet.Range(“A1:AM1”).Select
+Selection.Copy
+ActiveSheet.Range(“A1”).Select
+Sheets(“Summary”).Activate
+ActiveSheet.Range(“A1”).Select
+ActiveSheet.Paste
+ActiveSheet.Range(“A2”).Select
+Do While myfiles “”
+Set wb = Workbooks.Open(“” + TextBox1.Text + “” & myfiles)
+name = ActiveSheet.name
+wb.Sheets(name).Activate
+wb.Sheets(name).Range(“A2:AM2”).Select
+wb.Sheets(name).Range(Selection, Selection.End(xlDown)).Select
+Selection.Copy
+myfiles = Dir
+ThisWorkbook.Activate
+ThisWorkbook.Sheets(“Summary”).Activate
+If ActiveSheet.Range(“A2”) = “” Then
+ActiveSheet.Paste
+Application.CutCopyMode = False
+ThisWorkbook.Sheets(“Summary”).Columns.AutoFit
+ThisWorkbook.Sheets(“Summary”).Range(“A1”).Select
+Selection.End(xlDown).Select
+add = ActiveCell.Address
+wb.Sheets(name).Activate
+Application.CutCopyMode = False
+ActiveWorkbook.Close
+Else
+ActiveCell.Offset(1, 0).Select
+ActiveSheet.Paste
+Application.CutCopyMode = False
+ThisWorkbook.Sheets(“Summary”).Columns.AutoFit
+ThisWorkbook.Sheets(“Summary”).Range(“A1”).Select
+Selection.End(xlDown).Select
+add = ActiveCell.Address
+wb.Sheets(name).Activate
+Application.CutCopyMode = False
+ActiveWorkbook.Close
+End If
+Loop
+ActiveSheet.Range(“A1”).Select
+MsgBox “Process completed”, vbInformation
+End If
+End If
+errHandler:
+num = Sheets.Count
+If num > 3 Then
+MsgBox “Kindly delete previous data..!”, vbInformation
+ThisWorkbook.Sheets(“Summary”).Activate
+End If
+End Sub
